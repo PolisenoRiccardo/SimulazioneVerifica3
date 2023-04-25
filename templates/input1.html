@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Risultato</title>
+</head>
+<body>
+    <form action='/risultapiattaforma' method="get">
+        <p>Scegli la piattaforma:</p>
+        {% for piattaforma in piattaforme %}
+        <input type="radio" id={{piattaforma}} name="piattaforma" value={{piattaforma}}>
+        <label for={{piattaforma}}>{{piattaforma}}</label><br>
+        {% endfor %}    
+        <input type="submit" value="Conferma">
+    </form>
+</body>
+</html>
