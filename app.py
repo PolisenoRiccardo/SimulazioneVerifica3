@@ -9,6 +9,7 @@ import pandas as pd
 games = pd.read_csv('https://raw.githubusercontent.com/prasertcbs/basic-dataset/master/metacritic_games.csv')
 piattaformeLista = games['platform'].tolist()
 piattaformeLista = list(set(piattaformeLista))
+piattaforme = games.groupby('platform').count()[['game']]
 
 
 @app.route('/', methods=['GET'])
@@ -55,5 +56,44 @@ def es3():
     table = games[games['metauser_score'] == games['metauser_score'].max()]
     return render_template('risultato.html', table = table.to_html())
 
+@app.route('/giochi', methods=['GET'])
+def es4(): 
+    table = games.groupby('platform').count()[['game']]
+    return render_template('risultato.html', table = table.to_html())
+
+@app.route('/giochipiattaforme', methods=['GET'])
+def es5(): 
+    table = games.groupby('platform').count()[['game']]
+    return render_template('input5.html', table = table.to_html())
+
+@app.route('/risultatogiochi', methods=['GET'])
+def risultatoes5(): 
+    numerodigiochi = request.args.get('numerodigiochi')
+    table = piattaforme[piattaforme['game'] > int(numerodigiochi)]
+    return render_template('risultato.html', table = table.to_html())
+
+@app.route('/torta', methods=['GET'])
+def es6torta():
+    dati = piattaforme['game']
+    labels = piattaforme.index
+    fig, ax = plt.subplots()
+    ax.pie(dati, labels=labels)
+    output = io.BytesIO()
+    FigureCanvas(fig).print_png(output)
+    return Response(output.getvalue(), mimetype='image/png')
+
+@app.route('/treemap', methods=['GET'])
+def es6treemap():
+    dati = piattaforme['game']
+    labels = piattaforme.index
+    import squarify 
+    fig, ax = plt.subplots()
+    squarify.plot(dati, label=labels)
+    output = io.BytesIO()
+    FigureCanvas(fig).print_png(output)
+    return Response(output.getvalue(), mimetype='image/png')
+
 if __name__ == '__main__':
   app.run(host='0.0.0.0', port=32245, debug=True)
+
+
