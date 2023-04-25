@@ -9,7 +9,7 @@ import pandas as pd
 games = pd.read_csv('https://raw.githubusercontent.com/prasertcbs/basic-dataset/master/metacritic_games.csv')
 piattaformeLista = games['platform'].tolist()
 piattaformeLista = list(set(piattaformeLista))
-games['year'] = [int(anno[-4:]) for anno in games['release_date']]
+
 
 @app.route('/', methods=['GET'])
 def form():
@@ -44,8 +44,15 @@ def anno():
 
 @app.route('/risultatoAnno', methods=['GET'])
 def anno1(): 
+    games['year'] = [int(anno[-4:]) for anno in games['release_date']]
     annoInizio, annoFine = request.args.get('annoInizio'), request.args.get('annoFine')
     table = games[(games['year'] >= int(annoInizio)) & (games['year'] <= int(annoFine))]
+    return render_template('risultato.html', table = table.to_html())
+
+@app.route('/score', methods=['GET'])
+def es3(): 
+    games['metauser_score'] = games['metascore'] + games['user_score']
+    table = games[games['metauser_score'] == games['metauser_score'].max()]
     return render_template('risultato.html', table = table.to_html())
 
 if __name__ == '__main__':
