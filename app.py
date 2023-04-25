@@ -9,7 +9,7 @@ import pandas as pd
 games = pd.read_csv('https://raw.githubusercontent.com/prasertcbs/basic-dataset/master/metacritic_games.csv')
 piattaformeLista = games['platform'].tolist()
 piattaformeLista = list(set(piattaformeLista))
-piattaforme = games.groupby('platform').count()[['game']]
+piattaforme = games.groupby('platform').count()[['game']].reset_index()
 
 
 @app.route('/', methods=['GET'])
@@ -102,6 +102,36 @@ def risultatoes7():
     genere, piattaforma = request.args.get('genere'), request.args.get('piattaforma')
     table = games[(games['platform'] == piattaforma.upper()) & (games['genre'] == genere)]
     return render_template('risultato.html', table = table.to_html())
+
+# Dati esercizi 8 e 9 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+generi = games.groupby(['platform', 'genre']).count()[['game']].reset_index()
+totale = []
+piattaformeLista = piattaforme.values
+for platform in piattaformeLista:
+        for indice in range(len(generi[generi['platform'] == platform[0]])):
+            totale.append(platform[1])
+generi['totale'] = totale
+generi['percentuale'] = (generi['game'] / generi['totale']) * 100
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+@app.route('/percentuali', methods=['GET'])
+def es8(): 
+    
+    table = generi[['platform', 'genre','percentuale']]
+    return render_template('risultato.html', table = table.to_html())
+
+@app.route('/tortaPercentuali', methods=['GET'])
+def es9(): 
+    
+    generi['label'] = generi['platform'] + ' ' + generi['genre']
+    dati = generi['percentuale']
+    labels = generi['label']
+    fig, ax = plt.subplots()
+    ax.pie(dati, labels = labels)
+    output = io.BytesIO()
+    FigureCanvas(fig).print_png(output)
+    return Response(output.getvalue(), mimetype='image/png')
+
 if __name__ == '__main__':
   app.run(host='0.0.0.0', port=32245, debug=True)
 
