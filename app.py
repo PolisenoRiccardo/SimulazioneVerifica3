@@ -93,6 +93,15 @@ def es6treemap():
     FigureCanvas(fig).print_png(output)
     return Response(output.getvalue(), mimetype='image/png')
 
+@app.route('/genere', methods=['GET'])
+def es7(): 
+    return render_template('input6.html')
+
+@app.route('/risultatogenere', methods=['GET'])
+def risultatoes7(): 
+    genere, piattaforma = request.args.get('genere'), request.args.get('piattaforma')
+    table = games[(games['platform'] == piattaforma.upper()) & (games['genre'] == genere)]
+    return render_template('risultato.html', table = table.to_html())
 if __name__ == '__main__':
   app.run(host='0.0.0.0', port=32245, debug=True)
 
